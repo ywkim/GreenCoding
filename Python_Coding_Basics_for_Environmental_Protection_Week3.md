@@ -235,6 +235,62 @@ file.close()
 ```
 이 코드는 pm25와 pm10 컬럼의 데이터를 추출하여 평균값을 계산합니다.
 
+## 실습 개선하기
+
+- **함수 활용:**
+  - 데이터 처리를 위한 함수를 정의하여 사용하도록 합니다. 예를 들어, 파일에서 데이터를 읽고 필요한 정보를 추출하는 함수, 평균 값을 계산하는 함수 등을 만들 수 있습니다.
+
+- **딕셔너리 활용:**
+  - 각 날짜별 공기 질 데이터를 딕셔너리에 저장하여 날짜별로 쉽게 접근하고 분석할 수 있습니다.
+  - 예를 들어, `{"2023/11/1": [94, 44], "2023/11/2": [78, 37], ...}`와 같은 형태로 데이터를 저장합니다.
+
+- **데이터 처리 로직 개선:**
+  - 파일에서 데이터를 읽을 때, 각 줄을 처리하면서 빈 셀이나 잘못된 데이터를 건너뛰고 유효한 데이터만 분석에 사용합니다.
+
+### 개선된 코드
+
+```python
+# 데이터 처리를 위한 함수 정의
+def process_data(file_path):
+    data_dict = {}
+    with open(file_path, 'r') as file:
+        next(file)  # 첫 줄(헤더) 건너뛰기
+        for line in file:
+            parts = line.strip().split(',')
+            if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
+                date = parts[0]
+                pm25 = int(parts[1])
+                pm10 = int(parts[2])
+                data_dict[date] = [pm25, pm10]
+    return data_dict
+
+def calculate_average(data_dict):
+    pm25_total = 0
+    pm10_total = 0
+    count = 0
+    for date in data_dict:
+        pm25_total += data_dict[date][0]
+        pm10_total += data_dict[date][1]
+        count += 1
+    pm25_average = pm25_total / count if count > 0 else 0
+    pm10_average = pm10_total / count if count > 0 else 0
+    return pm25_average, pm10_average
+
+# 데이터 파일 경로
+file_path = '/path/to/seoul-air-quality.csv'
+
+# 데이터 처리
+data = process_data(file_path)
+
+# 평균 농도 계산
+pm25_average, pm10_average = calculate_average(data)
+
+# 결과 출력
+print(f"PM2.5 평균 농도: {pm25_average}, PM10 평균 농도: {pm10_average}")
+```
+
+이 코드는 파일에서 데이터를 읽어 딕셔너리에 저장하고, 각 오염 물질의 평균 농도를 계산합니다. 잘못된 데이터는 건너뛰어 분석의 정확성을 향상시킵니다.
+
 ---
 
 지금까지 우리는 서울의 공기 질 데이터를 읽고, 간단한 평균값 계산을 해보았습니다. 이 과정을 통해 여러분은 Python을 사용한 기본적인 파일 읽기 및 데이터 처리 방법을 익힐 수 있었습니다. 다음 파트에서는 이 데이터를 바탕으로 좀 더 심층적인 분석과 토론을 진행해보도록 하겠습니다.
@@ -327,7 +383,7 @@ file.close()
 
 다음은 오늘 강의에서 우리가 작성한 최종 코드입니다. 이 코드는 서울의 공기 질 데이터 파일을 열어, PM2.5와 PM10의 평균 농도를 계산합니다.
 
-### 최종 코드
+### 최종 코드 1
 ```python
 # 서울의 공기 질 데이터 분석을 위한 최종 코드
 
@@ -360,6 +416,51 @@ file.close()
 ```
 이 코드는 기본적인 파일 읽기와 데이터 처리를 통해 평균 농도를 계산하는 방법을 보여줍니다.
 
+### 최종 코드 2
+
+```python
+# 데이터 처리를 위한 함수 정의
+def process_data(file_path):
+    data_dict = {}
+    with open(file_path, 'r') as file:
+        next(file)  # 첫 줄(헤더) 건너뛰기
+        for line in file:
+            parts = line.strip().split(',')
+            if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
+                date = parts[0]
+                pm25 = int(parts[1])
+                pm10 = int(parts[2])
+                data_dict[date] = [pm25, pm10]
+    return data_dict
+
+def calculate_average(data_dict):
+    pm25_total = 0
+    pm10_total = 0
+    count = 0
+    for date in data_dict:
+        pm25_total += data_dict[date][0]
+        pm10_total += data_dict[date][1]
+        count += 1
+    pm25_average = pm25_total / count if count > 0 else 0
+    pm10_average = pm10_total / count if count > 0 else 0
+    return pm25_average, pm10_average
+
+# 데이터 파일 경로
+file_path = '/path/to/seoul-air-quality.csv'
+
+# 데이터 처리
+data = process_data(file_path)
+
+# 평균 농도 계산
+pm25_average, pm10_average = calculate_average(data)
+
+# 결과 출력
+print(f"PM2.5 평균 농도: {pm25_average}, PM10 평균 농도: {pm10_average}")
+```
+
+이 코드는 파일에서 데이터를 읽어 딕셔너리에 저장하고, 각 오염 물질의 평균 농도를 계산합니다. 잘못된 데이터는 건너뛰어 분석의 정확성을 향상시킵니다.
+
 ---
+
 
 여러분, 이번 주 강의에서 Python을 사용한 데이터 분석의 기초를 배워보았습니다. 다음 주에는 이러한 기본적인 개념들을 바탕으로 좀 더 복잡한 데이터 분석에 도전해 볼 예정이니, 기대해 주세요! 오늘 배운 내용을 잘 복습하고, 다음 강의에서 뵙겠습니다. 감사합니다!
